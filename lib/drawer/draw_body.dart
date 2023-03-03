@@ -1,4 +1,4 @@
-import 'dart:ui';
+part of 'ando_painter.dart';
 
 extension DrawAndroidBody on Canvas {
   void drawBody(

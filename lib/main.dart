@@ -1,12 +1,10 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:android_dance/definitions.dart';
-import 'package:android_dance/drawer/draw_body.dart';
-import 'package:android_dance/drawer/draw_head.dart';
-import 'package:android_dance/drawer/draw_limbs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'drawer/ando_painter.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,17 +43,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   late final Animation<double> animation;
 
+  late final ValueNotifier<AnimationStatus> animationStatus;
+
   @override
   void initState() {
     super.initState();
 
     controller = AnimationController(vsync: this)
-      ..addListener(() {
-        setState(() {});
-      })
-      ..duration = const Duration(seconds: 3);
+    ..addStatusListener((status) {
+      animationStatus.value = status;
+    })
+      ..duration = const Duration(milliseconds: 200);
 
     animation = Tween(begin: 0.0, end: 1.0).animate(controller);
+
+    animationStatus = ValueNotifier(controller.status);
   }
 
   @override
@@ -74,78 +76,32 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 painter: AndoChanPainter(
                     settings: AndoSettings(
                         width: width,
-                        height: height))),
+                        height: height,
+                        danceParam: controller.value))),
           ),
         );
       }),
+      floatingActionButton: ValueListenableBuilder(
+      valueListenable: animationStatus,
+        builder: (context, value, child) => ElevatedButton(
+          onPressed: () {
+            if (value == AnimationStatus.completed ||
+                value == AnimationStatus.dismissed) {
+              controller.repeat(reverse: true);
+            } else {
+              controller.reset();
+            }
+          },
+          child: Text(
+              value == AnimationStatus.completed ||
+                  value == AnimationStatus.dismissed
+                  ? 'Start Dancing'
+                  : 'Stop Dancing'),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
 
-class AndoChanPainter extends CustomPainter {
-  final Paint _androidPaint = Paint()
-    ..color = const Color(0xFF3DDC84)
-    ..style = PaintingStyle.fill
-    ..strokeWidth = 4;
 
-  final Paint _whitePaint = Paint()
-    ..color = Colors.white
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 2.0;
-
-  final AndoSettings settings;
-
-  AndoChanPainter({required this.settings});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawHead(
-        headCenter: settings.headCenter,
-        headRadius: settings.headRadius,
-        headRadiantStart: settings.headRadiantStart,
-        headRadiantSweep: settings.headRadiantSweep,
-        paint: _androidPaint,
-        antennaThickness: settings.antennaThickness,
-        antennaLeftLine: settings.antennaLeftLine,
-        antennaRightLine: settings.antennaRightLine,
-        whitePaint: _whitePaint,
-        leftEyePoint: settings.leftEyePoint,
-        rightEyePoint: settings.rightEyePoint,
-        eyeRadius: settings.eyeRadius);
-
-    canvas.drawBody(
-        bodyBottomCurveRadius: settings.bodyBottomCurveRadius,
-        bodyTopLeftX: settings.bodyTopLeftX,
-        bodyTopLeftY: settings.bodyTopLeftY,
-        bodyBottomCurveTopLeftX: settings.bodyBottomCurveTopLeftX,
-        bodyBottomCurveTopLeftY: settings.bodyBottomCurveTopLeftY,
-        bodyBottomCurveBottomLeftX: settings.bodyBottomCurveBottomLeftX,
-        bodyBottomCurveBottomLeftY: settings.bodyBottomCurveBottomLeftY,
-        bodyCurveLeftStart: settings.bodyCurveLeftStart,
-        bodyCurveLeftSweep: settings.bodyCurveLeftSweep,
-        bodyBottomCurveBottomRightX: settings.bodyBottomCurveBottomRightX,
-        bodyBottomCurveBottomRightY: settings.bodyBottomCurveBottomRightY,
-        bodyBottomCurveTopRightX: settings.bodyBottomCurveTopRightX,
-        bodyBottomCurveTopRightY: settings.bodyBottomCurveTopRightY,
-        bodyCurveRightStart: settings.bodyCurveRightStart,
-        bodyCurveRightSweep: settings.bodyCurveRightSweep,
-        bodyTopRightX: settings.bodyTopRightX,
-        bodyTopRightY: settings.bodyTopRightY,
-        paint: _androidPaint);
-
-    canvas.drawLimbs(
-        limbWidth: settings.limbWidth,
-        legLeftLine: settings.legLeftLine,
-        legRightLine: settings.legRightLine,
-        armLeftLine: settings.armLeftLine,
-        armRightLine: settings.armRightLine,
-        paint: _androidPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-
-  void _drawLimbs(Canvas canvas) {}
-}

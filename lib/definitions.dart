@@ -60,17 +60,17 @@ class AndoSettings {
   late final Line armLeftLine;
   late final Line armRightLine;
 
-  AndoSettings({
-    required this.width,
-    required this.height,
-  }) {
+  final double danceParam;
+
+  AndoSettings(
+      {required this.width, required this.height, required this.danceParam}) {
     andoWidth = width / 2;
     final double bodyHeight = andoWidth * 2;
 
     headCenter = Offset(andoWidth, andoWidth);
     headRadius = andoWidth / 2;
-     headRadiantStart = _degreeToRadiant(180);
-     headRadiantSweep = _degreeToRadiant(180);
+    headRadiantStart = _degreeToRadiant(180);
+    headRadiantSweep = _degreeToRadiant(180);
 
     final neckGap = andoWidth / 15;
 
@@ -78,32 +78,40 @@ class AndoSettings {
     antennaThickness = andoWidth / 20;
 
     final double antennaLeftX =
-        cos(_degreeToRadiant(245)) * andoWidth / 2 * 1.3 + width / 2;
+        cos(_degreeToRadiant(245 + 10 * danceParam)) * andoWidth / 2 * 1.3 +
+            width / 2;
     final double antennaLeftY =
-        sin(_degreeToRadiant(245)) * andoWidth / 2 * 1.3 + andoWidth;
+        sin(_degreeToRadiant(245 + 10 * danceParam)) * andoWidth / 2 * 1.3 +
+            andoWidth;
 
     antennaLeftLine = Line(Offset(width / 2, andoWidth - antennaThickness),
         Offset(antennaLeftX, antennaLeftY));
 
     final double antennaRightX =
-        cos(_degreeToRadiant(295)) * andoWidth / 2 * 1.3 + width / 2;
+        cos(_degreeToRadiant(295 - 10 * danceParam)) * andoWidth / 2 * 1.3 +
+            width / 2;
     final double antennaRightY =
-        sin(_degreeToRadiant(295)) * andoWidth / 2 * 1.3 + andoWidth;
+        sin(_degreeToRadiant(295 - 10 * danceParam)) * andoWidth / 2 * 1.3 +
+            andoWidth;
     antennaRightLine = Line(Offset(width / 2, andoWidth - antennaThickness),
         Offset(antennaRightX, antennaRightY));
 
     // eyes
     final double leftEyeX =
-        cos(_degreeToRadiant(235)) * andoWidth / 2 * 0.7 + width / 2;
+        cos(_degreeToRadiant(235 + 10 * danceParam)) * andoWidth / 2 * 0.7 +
+            width / 2;
     final double leftEyeY =
-        sin(_degreeToRadiant(235)) * andoWidth / 2 * 0.7 + andoWidth;
+        sin(_degreeToRadiant(235 + 10 * danceParam)) * andoWidth / 2 * 0.7 +
+            andoWidth;
 
     leftEyePoint = Offset(leftEyeX, leftEyeY);
 
     final double rightEyeX =
-        cos(_degreeToRadiant(305)) * andoWidth / 2 * 0.7 + width / 2;
+        cos(_degreeToRadiant(305 - 10 * danceParam)) * andoWidth / 2 * 0.7 +
+            width / 2;
     final double rightEyeY =
-        sin(_degreeToRadiant(305)) * andoWidth / 2 * 0.7 + andoWidth;
+        sin(_degreeToRadiant(305 - 10 * danceParam)) * andoWidth / 2 * 0.7 +
+            andoWidth;
     rightEyePoint = Offset(rightEyeX, rightEyeY);
 
     eyeRadius = andoWidth / 22;
@@ -136,38 +144,46 @@ class AndoSettings {
     limbWidth = neckGap * 4;
 
     // left leg
-    final legLeftStartX = bodyBottomCurveBottomLeftX + limbWidth / 2;
+    final legLeftStartX =
+        bodyBottomCurveBottomLeftX + limbWidth / 2 - 10 * danceParam;
     final legLeftStartY = bodyBottomCurveTopLeftY;
 
     final legLeftEndX = legLeftStartX;
-    final legLeftEndY = bodyBottomCurveBottomLeftY + limbWidth;
+    final legLeftEndY =
+        bodyBottomCurveBottomLeftY + limbWidth - 10 * danceParam;
 
     legLeftLine = Line(
         Offset(legLeftStartX, legLeftStartY), Offset(legLeftEndX, legLeftEndY));
 
     // right leg
-    final legRightStartX = bodyBottomCurveBottomRightX - limbWidth / 2;
+    final legRightStartX =
+        bodyBottomCurveBottomRightX - limbWidth / 2 + 10 * danceParam;
     final legRightStartY = bodyBottomCurveTopRightY;
 
     final legRightEndX = legRightStartX;
-    final legRightEndY = bodyBottomCurveBottomRightY + limbWidth;
+    final legRightEndY =
+        bodyBottomCurveBottomRightY + limbWidth - (danceParam > 0 ? 10 * (1 - danceParam) : 0);
 
     legRightLine = Line(Offset(legRightStartX, legRightStartY),
         Offset(legRightEndX, legRightEndY));
 
     // left arm
-    final armLeftStartX = bodyTopLeftX - limbWidth / 2 - neckGap;
+    final armLeftStartX =
+        bodyTopLeftX - limbWidth / 2 - neckGap + 10 * danceParam;
     final armLeftStartY = bodyTopLeftY + limbWidth / 2;
     final armLeftEndX = armLeftStartX;
-    final armLeftEndY = bodyTopLeftY + andoWidth - limbWidth * 1.5;
+    final armLeftEndY =
+        bodyTopLeftY + andoWidth - limbWidth * 1.5 - 10 * danceParam;
 
     armLeftLine = Line(
         Offset(armLeftStartX, armLeftStartY), Offset(armLeftEndX, armLeftEndY));
 
-    final armRightStartX = bodyTopRightX + limbWidth / 2 + neckGap;
+    final armRightStartX =
+        bodyTopRightX + limbWidth / 2 + neckGap - 10 * danceParam;
     final armRightStartY = bodyTopRightY + limbWidth / 2;
     final armRightEndX = armRightStartX;
-    final armRightEndY = bodyTopRightY + andoWidth - limbWidth * 1.5;
+    final armRightEndY =
+        bodyTopRightY + andoWidth - limbWidth * 1.5 - (danceParam > 0 ? 10 * (1 - danceParam) : 0);
 
     armRightLine = Line(Offset(armRightStartX, armRightStartY),
         Offset(armRightEndX, armRightEndY));

@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:android_dance/definitions.dart';
+part of 'ando_painter.dart';
 
 extension DrawAndroidHead on Canvas {
   void drawHead(

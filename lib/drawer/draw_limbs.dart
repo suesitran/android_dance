@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import '../definitions.dart';
+part of 'ando_painter.dart';
 
 extension DrawLimbs on Canvas {
   void drawLimbs(
