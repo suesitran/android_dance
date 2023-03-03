@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         final headRadiantStart = _degreeToRadiant(180);
         final headRadiantSweep = _degreeToRadiant(180);
 
-        const neckGap = 10;
+        final neckGap = andoWidth / 15;
 
         // antennas
         final double antennaLeftX =
@@ -117,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         final double bodyTopRightY = bodyTopLeftY;
 
         // limbs
-        const double limbWidth = neckGap * 4;
+        final double limbWidth = neckGap * 4;
 
         return SizedBox(
           width: width,
@@ -268,6 +268,8 @@ class AndoChanPainter extends CustomPainter {
     _drawTheHead(canvas);
 
     _drawBody(canvas);
+
+    _drawLimbs(canvas);
   }
 
   @override
@@ -307,8 +309,6 @@ class AndoChanPainter extends CustomPainter {
       ..lineTo(bodyBottomCurveTopLeftX, bodyBottomCurveTopLeftY)
       ..lineTo(bodyBottomCurveBottomLeftX, bodyBottomCurveBottomLeftY)
       ..lineTo(bodyBottomCurveBottomRightX, bodyBottomCurveBottomRightY)
-
-      /// so far this works fine
       ..lineTo(bodyBottomCurveTopRightX, bodyBottomCurveTopRightY)
       ..lineTo(bodyTopRightX, bodyTopRightY)
       ..close();
@@ -333,5 +333,49 @@ class AndoChanPainter extends CustomPainter {
         bodyCurveRightSweep,
         true,
         _androidPaint);
+  }
+
+  void _drawLimbs(Canvas canvas) {
+    // use thick paint
+    _androidPaint.strokeWidth = limbWidth;
+
+    /// draw legs
+    // left leg
+    final legLeftStartX = bodyBottomCurveBottomLeftX + limbWidth / 2;
+    final legLeftStartY = bodyBottomCurveTopLeftY;
+
+    final legLeftEndX = legLeftStartX;
+    final legLeftEndY = bodyBottomCurveBottomLeftY + limbWidth;
+    canvas.drawLine(Offset(legLeftStartX, legLeftStartY),
+        Offset(legLeftEndX, legLeftEndY), _androidPaint);
+
+    // right leg
+    final legRightStartX = bodyBottomCurveBottomRightX - limbWidth / 2;
+    final legRightStartY = bodyBottomCurveTopRightY;
+
+    final legRightEndX = legRightStartX;
+    final legRightEndY = bodyBottomCurveBottomRightY + limbWidth;
+
+    canvas.drawLine(Offset(legRightStartX, legRightStartY),
+        Offset(legRightEndX, legRightEndY), _androidPaint);
+
+    /// draw arms
+    // left arm
+    final armLeftStartX = bodyTopLeftX - limbWidth / 2 - 20;
+    final armLeftStartY = bodyTopLeftY + limbWidth / 2;
+    final armLeftEndX = armLeftStartX;
+    final armLeftEndY = bodyTopLeftY + andoWidth - limbWidth * 1.5;
+
+    canvas.drawLine(Offset(armLeftStartX, armLeftStartY),
+        Offset(armLeftEndX, armLeftEndY), _androidPaint);
+
+    // right arm
+    final armRightStartX = bodyTopRightX + limbWidth / 2 + 20;
+    final armRightStartY = bodyTopRightY + limbWidth / 2;
+    final armRightEndX = armRightStartX;
+    final armRightEndY = bodyTopRightY + andoWidth - limbWidth * 1.5;
+
+    canvas.drawLine(Offset(armRightStartX, armRightStartY),
+        Offset(armRightEndX, armRightEndY), _androidPaint);
   }
 }
