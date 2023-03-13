@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:android_dance/definitions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'drawer/ando_painter.dart';
+import 'ando_chan/ando.dart';
+import 'ando_chan/measurement.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,19 +67,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         final width = min(constraint.maxWidth, constraint.maxHeight);
         final height = max(constraint.maxWidth, constraint.maxHeight);
 
-        return SizedBox(
-          width: width,
-          height: height,
-          child: AnimatedBuilder(
-            animation: controller,
-            builder: (context, child) => CustomPaint(
-                painter: AndoChanPainter(
-                    settings: AndoSettings(
-                        width: width,
-                        height: height,
-                        danceParam: controller.value))),
-          ),
-        );
+        return AndoChan(measurement: AndoChanMeasurement(width: width, height: height));
       }),
       floatingActionButton: ValueListenableBuilder(
       valueListenable: animationStatus,
