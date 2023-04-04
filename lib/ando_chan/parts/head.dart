@@ -46,7 +46,7 @@ class Head extends StatelessWidget {
     // 5
     TweenSequenceItem(
         tween: Tween<Offset>(
-          begin: const Offset(0.0, 0.00),
+          begin: const Offset(0.0, -0.1),
           end: const Offset(-0.05, 0.05),
         ),
         weight: 0.5.weight),

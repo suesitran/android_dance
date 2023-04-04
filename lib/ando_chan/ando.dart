@@ -11,9 +11,9 @@ class AndoChan extends StatelessWidget {
   final AndoChanMeasurement measurement;
   final AnimationController controller;
   late final Animation<double> animation;
-  AndoChan(
-      {required this.measurement, required this.controller, Key? key})
-      : animation = jumpAndBounce(controller), super(key: key);
+  AndoChan({required this.measurement, required this.controller, Key? key})
+      : animation = jumpAndBounce(controller),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

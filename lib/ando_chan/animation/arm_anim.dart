@@ -23,9 +23,11 @@ Animation<double> leftArm(AnimationController controller) =>
       ...leftPointing,
       ...leftPointing,
       ...leftPointing,
-      // TODO - add more movement
-      rest(4),
-      // ...List.filled(40, rest)
+      ...leftArmMove,
+      ...leftArmMove,
+      ...leftArmMove,
+      ...leftArmMove,
+      rest(1),
     ]).animate(CurvedAnimation(parent: controller, curve: Curves.easeIn));
 
 Animation<double> rightArm(AnimationController controller) =>
@@ -48,9 +50,11 @@ Animation<double> rightArm(AnimationController controller) =>
       ...rightPointing,
       ...rightPointing,
       ...rightPointing,
-      // TODO add more movement
-      rest(4)
-      // ...List.filled(40, rest)
+      rest(1),
+      ...rightArmMove, // 1.5
+      ...rightArmMove,
+      ...rightArmMove,
+      ...rightArmMove,
     ]).animate(CurvedAnimation(parent: controller, curve: Curves.easeIn));
 
 /// separate movements

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:android_dance/ando_chan/animation/arm_anim.dart';
+import 'package:android_dance/mp3/music.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -43,11 +45,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late final AnimationController controller;
 
   late final ValueNotifier<AnimationStatus> animationStatus;
+  late final AssetsAudioPlayer player;
+
+  /// this music is taken from this youtube link:
+  /// https://www.youtube.com/watch?v=GhZML0HSli8
+  final String music = 'assets/bongbongbangbang.mp3';
 
   @override
   void initState() {
     super.initState();
 
+    player = AssetsAudioPlayer.newPlayer();
+
+    player.isPlaying.listen((event) {
+      if (!event) {
+        controller.reset();
+      } else {
+        controller.repeat(reverse: true);
+      }
+    });
     controller = AnimationController(vsync: this)
       ..addStatusListener((status) {
         animationStatus.value = status;
@@ -63,19 +79,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       body: SafeArea(
         child: Column(
           children: [
-            AnimatedBuilder(
-              animation: controller,
-              builder: (context, child) => Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Text(
-                  '${(controller.value * (controller.duration?.inSeconds ?? 0)).toInt()}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium
-                      ?.copyWith(color: Colors.black),
-                ),
-              ),
-            ),
             Flexible(child: LayoutBuilder(builder: (context, constraint) {
               final width = min(constraint.maxWidth, constraint.maxHeight);
               final height = max(constraint.maxWidth, constraint.maxHeight);
@@ -86,6 +89,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       AndoChanMeasurement(width: width, height: height),
                   controller: controller);
             })),
+            MusicSlider(
+                musicStream: player.currentPosition,
+                audioDuration: player.current),
           ],
         ),
       ),
@@ -95,9 +101,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           onPressed: () {
             if (value == AnimationStatus.completed ||
                 value == AnimationStatus.dismissed) {
-              controller.repeat(reverse: true);
+              player.open(
+                Audio(music),
+                autoStart: true,
+                showNotification: true,
+              );
             } else {
-              controller.reset();
+              player.stop();
             }
           },
           child: Text(value == AnimationStatus.completed ||
