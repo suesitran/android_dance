@@ -1,10 +1,15 @@
+import 'dart:async';
 import 'dart:math';
 
-import 'package:android_dance/definitions.dart';
+import 'package:android_dance/ando_chan/animation/arm_anim.dart';
+import 'package:android_dance/mp3/music.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'drawer/ando_painter.dart';
+import 'ando_chan/ando.dart';
+import 'ando_chan/animation/anim_definition.dart';
+import 'ando_chan/measurement.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,19 +25,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Ando Dance',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -41,21 +44,31 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late final AnimationController controller;
 
-  late final Animation<double> animation;
-
   late final ValueNotifier<AnimationStatus> animationStatus;
+  late final AssetsAudioPlayer player;
+
+  /// this music is taken from this youtube link:
+  /// https://www.youtube.com/watch?v=GhZML0HSli8
+  final String music = 'assets/bongbongbangbang.mp3';
 
   @override
   void initState() {
     super.initState();
 
-    controller = AnimationController(vsync: this)
-    ..addStatusListener((status) {
-      animationStatus.value = status;
-    })
-      ..duration = const Duration(milliseconds: 200);
+    player = AssetsAudioPlayer.newPlayer();
 
-    animation = Tween(begin: 0.0, end: 1.0).animate(controller);
+    player.isPlaying.listen((event) {
+      if (!event) {
+        controller.reset();
+      } else {
+        controller.repeat(reverse: true);
+      }
+    });
+    controller = AnimationController(vsync: this)
+      ..addStatusListener((status) {
+        animationStatus.value = status;
+      })
+      ..duration = const Duration(seconds: durationInSeconds);
 
     animationStatus = ValueNotifier(controller.status);
   }
@@ -63,40 +76,44 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(builder: (context, constraint) {
-        final width = min(constraint.maxWidth, constraint.maxHeight);
-        final height = max(constraint.maxWidth, constraint.maxHeight);
+      body: SafeArea(
+        child: Column(
+          children: [
+            Flexible(child: LayoutBuilder(builder: (context, constraint) {
+              final width = min(constraint.maxWidth, constraint.maxHeight);
+              final height = max(constraint.maxWidth, constraint.maxHeight);
 
-        return SizedBox(
-          width: width,
-          height: height,
-          child: AnimatedBuilder(
-            animation: controller,
-            builder: (context, child) => CustomPaint(
-                painter: AndoChanPainter(
-                    settings: AndoSettings(
-                        width: width,
-                        height: height,
-                        danceParam: controller.value))),
-          ),
-        );
-      }),
+              controller.value / (controller.duration?.inSeconds ?? 1);
+              return AndoChan(
+                  measurement:
+                      AndoChanMeasurement(width: width, height: height),
+                  controller: controller);
+            })),
+            MusicSlider(
+                musicStream: player.currentPosition,
+                audioDuration: player.current),
+          ],
+        ),
+      ),
       floatingActionButton: ValueListenableBuilder(
-      valueListenable: animationStatus,
+        valueListenable: animationStatus,
         builder: (context, value, child) => ElevatedButton(
           onPressed: () {
             if (value == AnimationStatus.completed ||
                 value == AnimationStatus.dismissed) {
-              controller.repeat(reverse: true);
+              player.open(
+                Audio(music),
+                autoStart: true,
+                showNotification: true,
+              );
             } else {
-              controller.reset();
+              player.stop();
             }
           },
-          child: Text(
-              value == AnimationStatus.completed ||
+          child: Text(value == AnimationStatus.completed ||
                   value == AnimationStatus.dismissed
-                  ? 'Start Dancing'
-                  : 'Stop Dancing'),
+              ? 'Start Dancing'
+              : 'Stop Dancing'),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -104,4 +121,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 }
 
-
+// class TimeTicker extends StatelessWidget {
+//   TimeTicker({Key? key}) : super(key: key) {
+//     Timer.periodic(const Duration(seconds: 1), (timer) {
+//       secondsCounter.value--;
+//       if (secondsCounter.value == 0) {
+//         timer.cancel();
+//       }
+//     });
+//   }
+//
+//   ValueNotifier<int> secondsCounter = ValueNotifier(durationInSeconds);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ValueListenableBuilder(valueListenable: secondsCounter, builder: (context, value, child) => Text('$value', style: Theme.of(context).textTheme.headlineMedium,),);
+//   }
+// }
